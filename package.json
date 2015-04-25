@@ -1,0 +1,27 @@
+{
+  "name": "xp-observer",
+  "license": "BSD-3-Clause",
+  "description": "This class is used to provide object observing functionalities.",
+  "version": "0.8.0",
+  "homepage": "https://github.com/ExpandJS/xp-observer",
+  "author": "ExpandJS <dev@expandjs.com> (http://www.expandjs.com)",
+  "contributors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ExpandJS/xp-observer.git"
+  },
+  "dependencies": {
+    "observe-js": "Polymer/observe-js",
+    "expandjs": "*"
+  },
+  "devDependencies": {
+    "browserify": "*"
+  },
+  "scripts": {
+    "browserify": "browserify index -i expandjs > dist/xp-observer.js"
+  }
+}

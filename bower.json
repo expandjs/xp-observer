@@ -1,0 +1,17 @@
+{
+  "name": "xp-observer",
+  "license": "BSD-3-Clause",
+  "version": "0.8.0",
+  "description": "This class is used to provide object observing functionalities.",
+  "authors": [
+    "Giuliano Rullo <g.rullo@expandjs.com>",
+    "Maurizio Stefàno <m.stefano@expandjs.com>",
+    "Robert Manolea <r.manolea@expandjs.com>"
+  ],
+  "main": [
+    "xp-observer.html"
+  ],
+  "dependencies": {
+    "expandjs": "ExpandJS/expandjs"
+  }
+}
