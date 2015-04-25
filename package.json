@@ -18,9 +18,6 @@
     "observe-js": "Polymer/observe-js",
     "expandjs": "*"
   },
-  "devDependencies": {
-    "browserify": "*"
-  },
   "scripts": {
     "browserify": "browserify index -i expandjs > dist/xp-observer.js"
   }
