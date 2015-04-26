@@ -2,7 +2,7 @@
   "name": "xp-observer",
   "license": "BSD-3-Clause",
   "description": "This class is used to provide object observing functionalities.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "homepage": "https://github.com/ExpandJS/xp-observer",
   "author": "ExpandJS <dev@expandjs.com> (http://www.expandjs.com)",
   "contributors": [
