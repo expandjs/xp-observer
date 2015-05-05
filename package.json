@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "observe-js": "Polymer/observe-js",
-    "expandjs": "*"
+    "expandjs": "*",
+    "xp-load": "*"
   },
   "scripts": {
     "browserify": "browserify index -i expandjs > dist/xp-observer.js",
