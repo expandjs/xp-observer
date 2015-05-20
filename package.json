@@ -4,7 +4,7 @@
   "description": "This class is used to provide object observing functionalities.",
   "version": "0.8.9",
   "homepage": "https://github.com/ExpandJS/xp-observer",
-  "author": "ExpandJS <dev@expandjs.com> (http://www.expandjs.com)",
+  "author": "ExpandJS <dev@expandjs.com> (http://expandjs.com)",
   "contributors": [
     "Giuliano Rullo <g.rullo@expandjs.com>",
     "Maurizio Stefàno <m.stefano@expandjs.com>",
