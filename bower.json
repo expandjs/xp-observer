@@ -22,5 +22,11 @@
   ],
   "dependencies": {
     "expandjs": "ExpandJS/expandjs"
-  }
+  },
+  "keywords": [
+      "expandjs",
+      "web app",
+      "observer",
+      "object observe"
+  ]
 }
