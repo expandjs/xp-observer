@@ -1,29 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.XPObserver = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 
 },{}],2:[function(require,module,exports){
-/*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
-
-module.exports = require('./lib');
-},{"./lib":3}],3:[function(require,module,exports){
-/*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
-
-(function (window) {
-    "use strict";
-
-    /**
-     * Returns required or a browser's global
-     *
-     * @param {Function | Object} required
-     * @param {string} browserName
-     * @returns {*}
-     */
-    module.exports = function (required, browserName) {
-        if (required && (typeof required !== 'object' || Object.keys(required).length)) { return required; }
-        if (window && typeof browserName === 'string') { return window[browserName]; }
-    };
-
-}(typeof window !== 'undefined' ? window : null));
-},{}],4:[function(require,module,exports){
 (function (global){
 /*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
 
@@ -38,13 +15,12 @@ module.exports = require('./lib');
     "use strict";
 
     // Vars
-    var load           = require('xp-load'),
-        XP             = require('expandjs'),
+    var XP             = require('expandjs'),
         observe        = global.ObjectObserver ? null : require('observe-js'),
         ObjectObserver = global.ObjectObserver;
 
     /*********************************************************************/
-
+    console.log(XP.Class, XP);
     /**
      * This class is used to provide object observing functionalities.
      *
@@ -329,7 +305,7 @@ module.exports = require('./lib');
 
 }(typeof window !== "undefined" ? window : global));
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"expandjs":1,"observe-js":5,"xp-load":2}],5:[function(require,module,exports){
+},{"expandjs":1,"observe-js":3}],3:[function(require,module,exports){
 (function (global){
 /*
  * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -2044,7 +2020,9 @@ module.exports = require('./lib');
 })(typeof global !== 'undefined' && global && typeof module !== 'undefined' && module ? global : this || window);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],6:[function(require,module,exports){
-arguments[4][2][0].apply(exports,arguments)
-},{"./lib":4,"dup":2}]},{},[6])(6)
+},{}],4:[function(require,module,exports){
+/*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
+
+module.exports = require('./lib');
+},{"./lib":2}]},{},[4])(4)
 });
