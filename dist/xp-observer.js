@@ -15,7 +15,7 @@
     "use strict";
 
     // Vars
-    var XP             = require('expandjs'),
+    var XP             = global.XP || require('expandjs'),
         observe        = global.ObjectObserver ? null : require('observe-js'),
         ObjectObserver = global.ObjectObserver;
 
