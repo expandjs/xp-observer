@@ -20,7 +20,7 @@
         ObjectObserver = global.ObjectObserver;
 
     /*********************************************************************/
-    console.log(XP.Class, XP);
+
     /**
      * This class is used to provide object observing functionalities.
      *
