@@ -19,9 +19,8 @@ module.exports = require('./lib');
     "use strict";
 
     // Vars
-    var XP             = global.XP || require('expandjs'),
-        observe        = global.ObjectObserver ? null : require('observe-js'),
-        ObjectObserver = global.ObjectObserver;
+    var XP       = global.XP || require('expandjs'),
+        Observer = require('observe-js').ObjectObserver;
 
     /*********************************************************************/
 
@@ -98,8 +97,8 @@ module.exports = require('./lib');
                 if ((XP.isObservable(value) && self.isObserved(value)) || (wrapper && !XP.includes(wrapper, value))) { return self; }
 
                 // Adding
-                if (value === self.value) { self.observer = self.connectObserver(new ObjectObserver(value)); }
-                if (value !== self.value) { self.observers.push(self.connectObserver(new ObjectObserver(value))); }
+                if (value === self.value) { self.observer = self.connectObserver(new Observer(value)); }
+                if (value !== self.value) { self.observers.push(self.connectObserver(new Observer(value))); }
                 if (self.deep) { XP.forEach(value, function (sub) { if (XP.isObservable(sub)) { self.addObserver(sub, value); } }); }
 
                 return self;
@@ -161,7 +160,7 @@ module.exports = require('./lib');
                 var self = this;
 
                 // Disconnecting
-                if (XP.isInstance(observer, ObjectObserver)) { observer.close(); } else { return observer; }
+                if (XP.isInstance(observer, Observer)) { observer.close(); } else { return observer; }
                 if (observer === self.observer) { self.observers.forEach(function (observer) { observer.close(); }); }
 
                 return observer;
