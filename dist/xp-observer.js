@@ -25,31 +25,31 @@ module.exports = require('./lib');
     /*********************************************************************/
 
     /**
-     * This class is used to provide object observing functionalities.
+     * This class is used to provide object observing functionality.
      *
      * @class XPObserver
-     * @description This class is used to provide object observing functionalities
+     * @description This class is used to provide object observing functionality
      */
     module.exports = new XP.Class('XPObserver', {
 
         /**
          * @constructs
          * @param {Array | Function | Object} value
-         * @param {Function} func
+         * @param {Function} callback
          * @param {boolean} [deep = false]
          */
-        initialize: function (value, func, deep) {
+        initialize: function (value, callback, deep) {
 
             // Asserting
             XP.assertArgument(XP.isObservable(value), 1, 'Array, Function or Object');
-            XP.assertArgument(XP.isFunction(func), 2, 'Function');
+            XP.assertArgument(XP.isFunction(callback), 2, 'Function');
 
             // Vars
             var self = this;
 
             // Setting
             self.value     = value;
-            self.func      = func;
+            self.callback  = callback;
             self.deep      = deep;
             self.observers = [];
 
@@ -121,21 +121,21 @@ module.exports = require('./lib');
                 XP.assertArgument(XP.isObject(observer), 1, 'Object');
 
                 // Vars
-                var self  = this,
-                    value = self.getObserved(observer),
-                    func  = function (added, removed, changed, getOld) {
+                var self     = this,
+                    value    = self.getObserved(observer),
+                    callback = function (added, removed, changed, getOld) {
 
                         // Updating
                         XP.forEach(added, function (sub) { if (XP.isObservable(sub)) { self.addObserver(sub, value); } });
                         XP.forEach(changed, function (sub, key) { if (XP.isObservable(sub)) { self.addObserver(sub, value).removeObserver(getOld(key)); } });
                         XP.forEach(removed, function (sub, key) { if (XP.isObservable(getOld(key))) { self.removeObserver(getOld(key)); } });
 
-                        return self.func(self.value);
+                        return self.callback(self.value);
                     };
 
                 // Connecting
-                if (value) { observer.open(func); } else { return observer; }
-                if (observer === self.observer) { self.observers.forEach(function (observer) { observer.open(func); }); }
+                if (value) { observer.open(callback); } else { return observer; }
+                if (observer === self.observer) { self.observers.forEach(function (observer) { observer.open(callback); }); }
 
                 return observer;
             }
@@ -179,7 +179,7 @@ module.exports = require('./lib');
             enumerable: false,
             value: function (observer) {
                 XP.assertArgument(XP.isObject(observer), 1, 'Object');
-                return observer._value;
+                return observer.value_;
             }
         },
 
@@ -195,7 +195,7 @@ module.exports = require('./lib');
             enumerable: false,
             value: function (value) {
                 XP.assertArgument(XP.isObservable(value), 1, 'Array, Function or Object');
-                return XP.find(this.observers, {_value: value});
+                return XP.find(this.observers, {value_: value});
             }
         },
 
@@ -250,22 +250,22 @@ module.exports = require('./lib');
         /**
          * TODO DOC
          *
-         * @property deep
-         * @type boolean
+         * @property callback
+         * @type Function
          */
-        deep: {
-            set: function (val) { return !!val; }
+        callback: {
+            set: function (val) { return XP.isFunction(val) ? function () { return val(); } : null; },
+            validate: function (val) { return XP.isFunction(val); }
         },
 
         /**
          * TODO DOC
          *
-         * @property func
-         * @type Function
+         * @property deep
+         * @type boolean
          */
-        func: {
-            set: function (val) { return XP.isFunction(val) ? function () { return val(); } : null; },
-            validate: function (val) { return XP.isFunction(val); }
+        deep: {
+            set: function (val) { return !!val; }
         },
 
         /**

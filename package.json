@@ -15,7 +15,7 @@
     "url": "https://github.com/ExpandJS/xp-observer.git"
   },
   "dependencies": {
-    "observe-js": "Polymer/observe-js",
+    "observe-js": "^0.4.0",
     "expandjs": "^0.9.4"
   },
   "scripts": {
