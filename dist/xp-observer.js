@@ -48,13 +48,13 @@ module.exports = require('./lib');
             var self = this;
 
             // Setting
-            self.value     = value;
-            self.callback  = callback;
-            self.deep      = deep;
-            self.observers = [];
+            self.value      = value;
+            self.callback   = callback;
+            self.deep       = deep;
+            self._observers = [];
 
             // Observing
-            self.addObserver(self.value);
+            self._addObserver(self.value);
 
             return self;
         },
@@ -68,7 +68,7 @@ module.exports = require('./lib');
          * @returns {Object}
          */
         disconnect: function () {
-            return this.disconnectObserver(this.observer) ? this : undefined;
+            return this._disconnectObserver(this._observer) ? this : undefined;
         },
 
         /*********************************************************************/
@@ -76,13 +76,13 @@ module.exports = require('./lib');
         /**
          * Adds the observer for value
          *
-         * @method addObserver
+         * @method _addObserver
          * @param {Array | Function | Object} value
          * @param {Array | Function | Object} [wrapper]
          * @returns {Object}
          * @private
          */
-        addObserver: {
+        _addObserver: {
             enumerable: false,
             value: function (value, wrapper) {
 
@@ -94,12 +94,12 @@ module.exports = require('./lib');
                 var self = this;
 
                 // Checking
-                if ((XP.isObservable(value) && self.isObserved(value)) || (wrapper && !XP.includes(wrapper, value))) { return self; }
+                if ((XP.isObservable(value) && self._isObserved(value)) || (wrapper && !XP.includes(wrapper, value))) { return self; }
 
                 // Adding
-                if (value === self.value) { self.observer = self.connectObserver(new Observer(value)); }
-                if (value !== self.value) { self.observers.push(self.connectObserver(new Observer(value))); }
-                if (self.deep) { XP.forEach(value, function (sub) { if (XP.isObservable(sub)) { self.addObserver(sub, value); } }); }
+                if (value === self.value) { self._observer = self._connectObserver(new Observer(value)); }
+                if (value !== self.value) { self._observers.push(self._connectObserver(new Observer(value))); }
+                if (self.deep) { XP.forEach(value, function (sub) { if (XP.isObservable(sub)) { self._addObserver(sub, value); } }); }
 
                 return self;
             }
@@ -108,12 +108,12 @@ module.exports = require('./lib');
         /**
          * Connects an observer
          *
-         * @method connectObserver
+         * @method _connectObserver
          * @param {Object} observer
          * @returns {Object}
          * @private
          */
-        connectObserver: {
+        _connectObserver: {
             enumerable: false,
             value: function (observer) {
 
@@ -122,20 +122,20 @@ module.exports = require('./lib');
 
                 // Vars
                 var self     = this,
-                    value    = self.getObserved(observer),
+                    value    = self._getObserved(observer),
                     callback = function (added, removed, changed, getOld) {
 
                         // Updating
-                        XP.forEach(added, function (sub) { if (XP.isObservable(sub)) { self.addObserver(sub, value); } });
-                        XP.forEach(changed, function (sub, key) { if (XP.isObservable(sub)) { self.addObserver(sub, value).removeObserver(getOld(key)); } });
-                        XP.forEach(removed, function (sub, key) { if (XP.isObservable(getOld(key))) { self.removeObserver(getOld(key)); } });
+                        XP.forEach(added, function (sub) { if (XP.isObservable(sub)) { self._addObserver(sub, value); } });
+                        XP.forEach(changed, function (sub, key) { if (XP.isObservable(sub)) { self._addObserver(sub, value)._removeObserver(getOld(key)); } });
+                        XP.forEach(removed, function (sub, key) { if (XP.isObservable(getOld(key))) { self._removeObserver(getOld(key)); } });
 
                         return self.callback(self.value);
                     };
 
                 // Connecting
                 if (value) { observer.open(callback); } else { return observer; }
-                if (observer === self.observer) { self.observers.forEach(function (observer) { observer.open(callback); }); }
+                if (observer === self._observer) { self._observers.forEach(function (observer) { observer.open(callback); }); }
 
                 return observer;
             }
@@ -144,12 +144,12 @@ module.exports = require('./lib');
         /**
          * Disconnects an observer
          *
-         * @method disconnectObserver
+         * @method _disconnectObserver
          * @param {Object} observer
          * @returns {Object}
          * @private
          */
-        disconnectObserver: {
+        _disconnectObserver: {
             enumerable: false,
             value: function (observer) {
 
@@ -161,7 +161,7 @@ module.exports = require('./lib');
 
                 // Disconnecting
                 if (XP.isInstance(observer, Observer)) { observer.close(); } else { return observer; }
-                if (observer === self.observer) { self.observers.forEach(function (observer) { observer.close(); }); }
+                if (observer === self._observer) { self._observers.forEach(function (observer) { observer.close(); }); }
 
                 return observer;
             }
@@ -170,12 +170,12 @@ module.exports = require('./lib');
         /**
          * Returns the value of observer
          *
-         * @method getObserved
+         * @method _getObserved
          * @param {Object} observer
          * @returns {Array | Object}
          * @private
          */
-        getObserved: {
+        _getObserved: {
             enumerable: false,
             value: function (observer) {
                 XP.assertArgument(XP.isObject(observer), 1, 'Object');
@@ -186,44 +186,44 @@ module.exports = require('./lib');
         /**
          * Returns the observer of value
          *
-         * @method getObserver
+         * @method _getObserver
          * @param {Array | Function | Object} value
          * @returns {Object | undefined}
          * @private
          */
-        getObserver: {
+        _getObserver: {
             enumerable: false,
             value: function (value) {
                 XP.assertArgument(XP.isObservable(value), 1, 'Array, Function or Object');
-                return XP.find(this.observers, {value_: value});
+                return XP.find(this._observers, {value_: value});
             }
         },
 
         /**
          * Returns true if value is observed
          *
-         * @method isObserved
+         * @method _isObserved
          * @param {Array | Function | Object} value
          * @returns {boolean}
          * @private
          */
-        isObserved: {
+        _isObserved: {
             enumerable: false,
             value: function (value) {
                 XP.assertArgument(XP.isObservable(value), 1, 'Array, Function or Object');
-                return value === this.value ? !!this.observer : !!this.getObserver(value);
+                return value === this.value ? !!this._observer : !!this._getObserver(value);
             }
         },
 
         /**
          * Removes the observer of value
          *
-         * @method removeObserver
+         * @method _removeObserver
          * @param {Array | Function | Object} value
          * @returns {Object}
          * @private
          */
-        removeObserver: {
+        _removeObserver: {
             enumerable: false,
             value: function (value) {
 
@@ -232,14 +232,14 @@ module.exports = require('./lib');
 
                 // Vars
                 var self     = this,
-                    observer = self.getObserver(value);
+                    observer = self._getObserver(value);
 
                 // Checking
                 if (!observer || XP.includesDeep(self.value, value)) { return self; }
 
                 // Removing
-                XP.pull(self.observers, self.disconnectObserver(observer));
-                XP.forEach(self.deep ? value : {}, function (sub) { if (XP.isObservable(sub)) { self.removeObserver(sub); } });
+                XP.pull(self._observers, self._disconnectObserver(observer));
+                XP.forEach(self.deep ? value : {}, function (sub) { if (XP.isObservable(sub)) { self._removeObserver(sub); } });
 
                 return self;
             }
@@ -271,38 +271,40 @@ module.exports = require('./lib');
         /**
          * TODO DOC
          *
-         * @property observer
-         * @type Object
-         * @private
-         */
-        observer: {
-            enumerable: false,
-            set: function (val) { return this.observer || val; },
-            validate: function (val) { return XP.isObject(val); }
-        },
-
-        /**
-         * TODO DOC
-         *
-         * @property observers
-         * @type Array
-         * @private
-         */
-        observers: {
-            enumerable: false,
-            set: function (val) { return this.observers || val; },
-            validate: function (val) { return XP.isArray(val); }
-        },
-
-        /**
-         * TODO DOC
-         *
          * @property value
          * @type Array | Function | Object
          */
         value: {
             set: function (val) { return this.value || val; },
             validate: function (val) { return XP.isObservable(val); }
+        },
+
+        /*********************************************************************/
+
+        /**
+         * TODO DOC
+         *
+         * @property _observer
+         * @type Object
+         * @private
+         */
+        _observer: {
+            enumerable: false,
+            set: function (val) { return this._observer || val; },
+            validate: function (val) { return XP.isObject(val); }
+        },
+
+        /**
+         * TODO DOC
+         *
+         * @property _observers
+         * @type Array
+         * @private
+         */
+        _observers: {
+            enumerable: false,
+            set: function (val) { return this._observers || val; },
+            validate: function (val) { return XP.isArray(val); }
         }
     });
 
