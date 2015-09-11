@@ -1,7 +1,7 @@
 {
   "name": "xp-observer",
   "license": "BSD-3-Clause",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "main": "xp-observer.html",
   "description": "This class is used to provide object observing functionalities",
   "homepage": "http://expandjs.com/classes/xp-observer",
@@ -21,6 +21,6 @@
     "**/.*"
   ],
   "dependencies": {
-    "expandjs": "ExpandJS/expandjs#0.9.8"
+    "expandjs": "ExpandJS/expandjs#0.9.9"
   }
 }
