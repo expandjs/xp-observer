@@ -2,7 +2,7 @@
   "name": "xp-observer",
   "license": "BSD-3-Clause",
   "description": "This class is used to provide object observing functionalities.",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "homepage": "https://github.com/ExpandJS/xp-observer",
   "author": "ExpandJS <dev@expandjs.com> (http://expandjs.com)",
   "contributors": [
@@ -16,11 +16,16 @@
   },
   "dependencies": {
     "observe-js": "^0.4.0",
-    "expandjs": "^0.9.9"
+    "expandjs": "^0.9.10"
+  },
+  "devDependencies": {
+    "browserify": "*",
+    "derequire": "*",
+    "minifyify": "*"
   },
   "scripts": {
-    "build": "browserify index -i expandjs --standalone XPObserver > dist/xp-observer.js && npm run build:min",
-    "build:min": "browserify -d index -i expandjs --standalone XPObserver -p [minifyify --map xp-observer.min.map --output dist/xp-observer.min.map] > dist/xp-observer.min.js"
+    "build": "browserify index -i expandjs | derequire > dist/xp-observer.js && npm run build:min",
+    "build:min": "browserify -d index -i expandjs -p [minifyify --map xp-observer.min.map --output dist/xp-observer.min.map] | derequire > dist/xp-observer.min.js"
   },
   "keywords": [
       "expandjs",
