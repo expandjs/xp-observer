@@ -1,10 +1,8 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.XPObserver = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-
-},{}],2:[function(_dereq_,module,exports){
 /*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
 
 module.exports = _dereq_('./lib');
-},{"./lib":3}],3:[function(_dereq_,module,exports){
+},{"./lib":2}],2:[function(_dereq_,module,exports){
 (function (global){
 /*jslint browser: true, devel: true, node: true, ass: true, nomen: true, unparam: true, indent: 4 */
 
@@ -235,7 +233,7 @@ module.exports = _dereq_('./lib');
                     observer = self._getObserver(value);
 
                 // Checking
-                if (!observer || XP.includesDeep(self.value, value)) { return self; }
+                if (!observer || XP.findDeep(self.value, value)) { return self; }
 
                 // Removing
                 XP.pull(self._observers, self._disconnectObserver(observer));
@@ -309,8 +307,9 @@ module.exports = _dereq_('./lib');
     });
 
 }(typeof window !== "undefined" ? window : global));
+
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"expandjs":1,"observe-js":4}],4:[function(_dereq_,module,exports){
+},{"expandjs":4,"observe-js":3}],3:[function(_dereq_,module,exports){
 (function (global){
 /*
  * Copyright (c) 2014 The Polymer Project Authors. All rights reserved.
@@ -407,7 +406,7 @@ module.exports = _dereq_('./lib');
 
   var numberIsNaN = global.Number.isNaN || function(value) {
     return typeof value === 'number' && global.isNaN(value);
-  }
+  };
 
   function areSameValue(left, right) {
     if (left === right)
@@ -543,7 +542,7 @@ module.exports = _dereq_('./lib');
       'ws': ['afterElement'],
       ']': ['inPath', 'push']
     }
-  }
+  };
 
   function noop() {}
 
@@ -563,7 +562,7 @@ module.exports = _dereq_('./lib');
 
       append: function() {
         if (key === undefined)
-          key = newChar
+          key = newChar;
         else
           key += newChar;
       }
@@ -656,7 +655,7 @@ module.exports = _dereq_('./lib');
     if (!parts)
       return invalidPath;
 
-    var path = new Path(parts, constructorIsPrivate);
+    path = new Path(parts, constructorIsPrivate);
     pathCache[pathString] = path;
     return path;
   }
@@ -689,11 +688,12 @@ module.exports = _dereq_('./lib');
       return pathString;
     },
 
-    getValueFrom: function(obj, directObserver) {
+    getValueFrom: function(obj, defaultValue) {
       for (var i = 0; i < this.length; i++) {
-        if (obj == null)
-          return;
-        obj = obj[this[i]];
+        var key = this[i];
+        if (obj == null || !(key in obj))
+          return defaultValue;
+        obj = obj[key];
       }
       return obj;
     },
@@ -717,15 +717,17 @@ module.exports = _dereq_('./lib');
       for (; i < (this.length - 1); i++) {
         key = this[i];
         pathString += isIdent(key) ? '.' + key : formatAccessor(key);
-        str += ' &&\n     ' + pathString + ' != null';
+        str += ' &&\n    ' + pathString + ' != null';
       }
-      str += ')\n';
 
-      var key = this[i];
-      pathString += isIdent(key) ? '.' + key : formatAccessor(key);
+      key = this[i];
+      var keyIsIdent = isIdent(key);
+      var keyForInOperator = keyIsIdent ? '"' + key.replace(/"/g, '\\"') + '"' : key;
+      str += ' &&\n    ' + keyForInOperator + ' in ' + pathString + ')\n';
+      pathString += keyIsIdent ? '.' + key : formatAccessor(key);
 
-      str += '  return ' + pathString + ';\nelse\n  return undefined;';
-      return new Function('obj', str);
+      str += '  return ' + pathString + ';\nelse\n  return defaultValue;';
+      return new Function('obj', 'defaultValue', str);
     },
 
     setValueFrom: function(obj, value) {
@@ -779,8 +781,9 @@ module.exports = _dereq_('./lib');
     var added = {};
     var removed = {};
     var changed = {};
+    var prop;
 
-    for (var prop in oldObject) {
+    for (prop in oldObject) {
       var newValue = object[prop];
 
       if (newValue !== undefined && newValue === oldObject[prop])
@@ -795,7 +798,7 @@ module.exports = _dereq_('./lib');
         changed[prop] = newValue;
     }
 
-    for (var prop in object) {
+    for (prop in object) {
       if (prop in oldObject)
         continue;
 
@@ -827,7 +830,7 @@ module.exports = _dereq_('./lib');
   var runEOM = hasObserve ? (function(){
     return function(fn) {
       return Promise.resolve().then(fn);
-    }
+    };
   })() :
   (function() {
     return function(fn) {
@@ -948,15 +951,15 @@ module.exports = _dereq_('./lib');
       if (allRootObjNonObservedProps(recs))
         return;
 
-      var observer;
-      for (var i = 0; i < observers.length; i++) {
+      var i, observer;
+      for (i = 0; i < observers.length; i++) {
         observer = observers[i];
         if (observer.state_ == OPENED) {
           observer.iterateObjects_(observe);
         }
       }
 
-      for (var i = 0; i < observers.length; i++) {
+      for (i = 0; i < observers.length; i++) {
         observer = observers[i];
         if (observer.state_ == OPENED) {
           observer.check_();
@@ -1073,7 +1076,7 @@ module.exports = _dereq_('./lib');
       this.check_(undefined, true);
       return this.value_;
     }
-  }
+  };
 
   var collectObservers = !hasObserve;
   var allObservers;
@@ -1168,7 +1171,7 @@ module.exports = _dereq_('./lib');
       var copy = Array.isArray(object) ? [] : {};
       for (var prop in object) {
         copy[prop] = object[prop];
-      };
+      }
       if (Array.isArray(object))
         copy.length = object.length;
       return copy;
@@ -1287,11 +1290,12 @@ module.exports = _dereq_('./lib');
     });
   };
 
-  function PathObserver(object, path) {
+  function PathObserver(object, path, defaultValue) {
     Observer.call(this);
 
     this.object_ = object;
     this.path_ = getPath(path);
+    this.defaultValue_ = defaultValue;
     this.directObserver_ = undefined;
   }
 
@@ -1324,7 +1328,7 @@ module.exports = _dereq_('./lib');
 
     check_: function(changeRecords, skipChanges) {
       var oldValue = this.value_;
-      this.value_ = this.path_.getValueFrom(this.object_);
+      this.value_ = this.path_.getValueFrom(this.object_, this.defaultValue_);
       if (skipChanges || areSameValue(this.value_, oldValue))
         return false;
 
@@ -1357,7 +1361,7 @@ module.exports = _dereq_('./lib');
         var object;
         var needsDirectObserver = false;
         for (var i = 0; i < this.observed_.length; i += 2) {
-          object = this.observed_[i]
+          object = this.observed_[i];
           if (object !== observerSentinel) {
             needsDirectObserver = true;
             break;
@@ -1389,7 +1393,7 @@ module.exports = _dereq_('./lib');
       if (this.state_ != UNOPENED && this.state_ != RESETTING)
         throw Error('Cannot add paths once started.');
 
-      var path = getPath(path);
+      path = getPath(path);
       this.observed_.push(object, path);
       if (!this.reportChangesOnOpen_)
         return;
@@ -1428,9 +1432,9 @@ module.exports = _dereq_('./lib');
     iterateObjects_: function(observe) {
       var object;
       for (var i = 0; i < this.observed_.length; i += 2) {
-        object = this.observed_[i]
+        object = this.observed_[i];
         if (object !== observerSentinel)
-          this.observed_[i + 1].iterateObjects(object, observe)
+          this.observed_[i + 1].iterateObjects(object, observe);
       }
     },
 
@@ -1530,7 +1534,7 @@ module.exports = _dereq_('./lib');
       this.getValueFn_ = undefined;
       this.setValueFn_ = undefined;
     }
-  }
+  };
 
   var expectedRecordTypes = {
     add: true,
@@ -1574,14 +1578,15 @@ module.exports = _dereq_('./lib');
       }
     }
 
-    for (var prop in added)
+    var prop;
+    for (prop in added)
       added[prop] = object[prop];
 
-    for (var prop in removed)
+    for (prop in removed)
       removed[prop] = undefined;
 
     var changed = {};
-    for (var prop in oldValues) {
+    for (prop in oldValues) {
       if (prop in added || prop in removed)
         continue;
 
@@ -1632,18 +1637,20 @@ module.exports = _dereq_('./lib');
       var columnCount = currentEnd - currentStart + 1;
       var distances = new Array(rowCount);
 
+      var i, j;
+
       // "Addition" rows. Initialize null column.
-      for (var i = 0; i < rowCount; i++) {
+      for (i = 0; i < rowCount; i++) {
         distances[i] = new Array(columnCount);
         distances[i][0] = i;
       }
 
       // Initialize null row
-      for (var j = 0; j < columnCount; j++)
+      for (j = 0; j < columnCount; j++)
         distances[0][j] = j;
 
-      for (var i = 1; i < rowCount; i++) {
-        for (var j = 1; j < columnCount; j++) {
+      for (i = 1; i < rowCount; i++) {
+        for (j = 1; j < columnCount; j++) {
           if (this.equals(current[currentStart + j - 1], old[oldStart + i - 1]))
             distances[i][j] = distances[i - 1][j - 1];
           else {
@@ -1754,8 +1761,9 @@ module.exports = _dereq_('./lib');
       if (currentEnd - currentStart == 0 && oldEnd - oldStart == 0)
         return [];
 
+      var splice;
       if (currentStart == currentEnd) {
-        var splice = newSplice(currentStart, [], 0);
+        splice = newSplice(currentStart, [], 0);
         while (oldStart < oldEnd)
           splice.removed.push(old[oldStart++]);
 
@@ -1767,7 +1775,6 @@ module.exports = _dereq_('./lib');
           this.calcEditDistances(current, currentStart, currentEnd,
                                  old, oldStart, oldEnd));
 
-      var splice = undefined;
       var splices = [];
       var index = currentStart;
       var oldIndex = oldStart;
@@ -1909,7 +1916,7 @@ module.exports = _dereq_('./lib');
           // merged splice is a noop. discard.
           inserted = true;
         } else {
-          var removed = current.removed;
+          removed = current.removed;
 
           if (splice.index < current.index) {
             // some prefix of splice.removed is prepended to current.removed.
@@ -1937,7 +1944,7 @@ module.exports = _dereq_('./lib');
         splices.splice(i, 0, splice);
         i++;
 
-        var offset = splice.addedCount - splice.removed.length
+        var offset = splice.addedCount - splice.removed.length;
         current.index += offset;
         insertionOffset += offset;
       }
@@ -1983,8 +1990,8 @@ module.exports = _dereq_('./lib');
         if (splice.removed[0] !== array[splice.index])
           splices.push(splice);
 
-        return
-      };
+        return;
+      }
 
       splices = splices.concat(calcSplices(array, splice.index, splice.index + splice.addedCount,
                                            splice.removed, 0, splice.removed.length));
@@ -2021,9 +2028,11 @@ module.exports = _dereq_('./lib');
   expose.CompoundObserver = CompoundObserver;
   expose.Path = Path;
   expose.ObserverTransform = ObserverTransform;
-  
+
 })(typeof global !== 'undefined' && global && typeof module !== 'undefined' && module ? global : this || window);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}]},{},[2])(2)
+},{}],4:[function(_dereq_,module,exports){
+
+},{}]},{},[1])(1)
 });
