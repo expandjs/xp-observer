@@ -233,7 +233,7 @@ module.exports = _dereq_('./lib');
                     observer = self._getObserver(value);
 
                 // Checking
-                if (!observer || XP.findDeep(self.value, value)) { return self; }
+                if (!observer || XP.includesDeep(self.value, value)) { return self; }
 
                 // Removing
                 XP.pull(self._observers, self._disconnectObserver(observer));
